@@ -1,20 +1,42 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png" />
-    <HelloWorld msg="Welcome to Your Vue.js + TypeScript App" />
+    <Auth
+      :apiurl="apiurl"
+      @token-updated="onTokenUpdate($event)"
+      v-show="!isAuthenticated()"
+    />
+    <div v-show="isAuthenticated()" class="authenticated">
+      <h1>77 C LA CHAMPIONS LEAGUE</h1>
+    </div>
+    <!-- login component  -->
+    <!-- side bar component -->
+    <!-- main component -->
+    <!-- footer component -->
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
-import HelloWorld from "./components/HelloWorld.vue";
+import { IinfoType } from "./types";
+import Auth from "./components/Authentication.vue";
+import { Component, Prop, Vue } from "vue-property-decorator";
 
 @Component({
   components: {
-    HelloWorld
+    Auth
   }
 })
-export default class App extends Vue {}
+export default class App extends Vue {
+  token: string | null = null;
+  apiurl: string = "http://localhost:3300";
+
+  isAuthenticated() {
+    return this.token !== null;
+  }
+
+  onTokenUpdate(token: string) {
+    this.token = token;
+  }
+}
 </script>
 
 <style>
