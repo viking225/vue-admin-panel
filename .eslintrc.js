@@ -10,7 +10,6 @@ module.exports = {
     "prettier/prettier": [ 'error',
       {
         htmlWhitespaceSensitivity: 'ignore',
-        parser: "vue"
       }
     ]
   },
