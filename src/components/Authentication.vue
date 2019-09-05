@@ -86,8 +86,8 @@ export default class Authentication extends Vue {
       }
     };
 
-    let response = null;
-    let res = null;
+    let response: any = null;
+    let res: any = null;
     try {
       res = await fetch(this.connectUrl, fetchParams);
       response = await res.json();
