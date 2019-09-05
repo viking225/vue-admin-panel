@@ -10,4 +10,21 @@ interface IObject {
   [key: string] : any;
 }
 
-export { IinfoType, IObject, RequestTypes };
+interface IPrintInfosAlias {
+  value: string;
+  alias: string;
+  order?: Number;
+}
+
+interface IPrintInfos {
+  exclude: string[]
+  alias: IPrintInfosAlias[]
+}
+
+interface IEndpointElement {
+  name: string;
+  endpoint?: string;
+  print?: IPrintInfos;
+}
+
+export { IinfoType, IObject, RequestTypes, IEndpointElement, IPrintInfos, IPrintInfosAlias };
