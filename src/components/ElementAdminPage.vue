@@ -30,7 +30,6 @@
           :data="item"
           :attributes="headerInfos"
           :apiurl="endpoint"
-          :token="token"
           class="line-element"
           @item-removed="onItemRemoved($event)"
         />
@@ -59,7 +58,7 @@ import {
   IPrintInfos,
   IPrintInfosAlias
 } from "../types";
-import { StringHelper } from "../helpers";
+import { StringHelper, StorageHelper, apiHelper } from "../helpers";
 import LineEditElement from "./LineEditElement.vue";
 import { FlowerSpinner } from "epic-spinners";
 
@@ -72,8 +71,6 @@ import { FlowerSpinner } from "epic-spinners";
 export default class ElementAdminPage extends Vue {
   // Props
   @Prop() private endpointInfo!: IEndpointElement;
-  @Prop() private apiurl!: string;
-  @Prop() private token!: String;
 
   // data
   // Array of attribute to print
@@ -99,25 +96,20 @@ export default class ElementAdminPage extends Vue {
   // Life cycle
   created() {}
   mounted() {
-    if (this.token) {
+    const token = StorageHelper.getToken();
+    if (token) {
       this.loadItems();
     }
   }
 
   // Computed
   get endpoint() {
-    const endpoint = this.endpointInfo.endpoint
+    return this.endpointInfo.endpoint
       ? this.endpointInfo.endpoint
       : this.endpointInfo.name.toLowerCase();
-    return `${this.apiurl}/${endpoint}/`;
   }
 
   // Watcher
-  @Watch("token")
-  onTokenUpdated() {
-    this.loadItems();
-  }
-
   @Watch("items")
   refreshHeaderAttributes() {
     if (this.items.length === 0) {
@@ -185,11 +177,7 @@ export default class ElementAdminPage extends Vue {
       loading: true
     };
     const fetchParams = {
-      method: "GET",
-      headers: {
-        "Content-type": "application/json",
-        Authorization: `${this.token}`
-      }
+      method: "GET"
     };
 
     let fetchUrl = this.endpoint;
@@ -210,10 +198,8 @@ export default class ElementAdminPage extends Vue {
     }, `${fetchUrl}`);
 
     let response: any = null;
-    let res: any = null;
     try {
-      res = await fetch(fetchUrl, fetchParams);
-      response = await res.json();
+      response = await apiHelper.request(fetchUrl, fetchParams);
     } catch (e) {
       this.classes = {
         error: true,
@@ -223,12 +209,12 @@ export default class ElementAdminPage extends Vue {
       return;
     }
     this.classes.loading = false;
-    if (res.status !== 200) {
+    if (response.status !== 200) {
       this.classes.error = true;
       this.errorMsg = `${response.message}`;
       return;
     }
-    const { data, total, limit, skip } = response;
+    const { data, total, limit, skip } = response.json;
     this.pageInfos.max = this.getPageNumber(total, limit);
     this.pageInfos.actual = skip < limit ? 1 : Math.ceil(skip / limit) + 1;
     this.items = data;

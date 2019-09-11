@@ -1,94 +1,56 @@
 <template>
   <div id="app">
-    <auth
-      :apiurl="apiurl"
-      @token-updated="onTokenUpdate($event)"
-      v-show="!isAuthenticated()"
-    />
-    <div v-show="isAuthenticated()" class="authenticated">
+    <div class="content">
       <div class="mainContent">
-        <element-admin-page
-          :endpoint-info="getData()"
-          :token="token"
-          :apiurl="apiurl"
-        />
+        <router-view></router-view>
       </div>
-      <sidebar :endpoints="endpointsInfos" class="sidebar" />
+      <div id="sidebarComponent">
+        <h1 class="title">Menu</h1>
+        <div
+          v-for="(endpoint, index) in menuInfo"
+          :key="`endpoint-${index}`"
+          class="endpointDiv"
+        >
+          <router-link :to="`/${endpoint.path}`">
+            {{ endpoint.name }}
+          </router-link>
+        </div>
+      </div>
     </div>
-    <!-- login component  -->
-    <!-- side bar component -->
-    <!-- main component -->
-    <!-- footer component -->
   </div>
 </template>
 
 <script lang="ts">
 import { IinfoType, IObject, IEndpointElement } from "./types";
-import Auth from "./components/Authentication.vue";
-import Sidebar from "./components/Sidebar.vue";
-import ElementAdminPage from "./components/ElementAdminPage.vue";
+import { endpoints } from "./config";
 import { Component, Prop, Vue } from "vue-property-decorator";
+import { StorageHelper, StringHelper } from "./helpers";
 
-@Component({
-  components: {
-    Auth,
-    Sidebar,
-    ElementAdminPage
-  }
-})
+@Component({})
 export default class App extends Vue {
   // Data
-  private token: string | null = null;
-  private apiurl: string = "http://localhost:3300";
-  private endpointsInfos: IEndpointElement[] | null = null;
-
   // LifeCycle
-  created() {
-    this.endpointsInfos = [
-      {
-        name: "Peoples",
-        print: {
-          exclude: [
-            "_id",
-            "__v",
-            "lastFirstName",
-            "firstLastName",
-            "picturePro"
-          ],
-          alias: [
-            {
-              value: "lastName",
-              alias: "Nom",
-              order: 0
-            },
-            {
-              value: "firstName",
-              alias: "Prénom",
-              order: 1
-            }
-          ]
-        }
-      },
-      {
-        name: "Tools"
-      },
-      {
-        name: "Users"
-      }
-    ];
-  }
+  created() {}
 
+  // Computed
+  get menuInfo() {
+    const menuInfo: { path: string; name: string }[] = [];
+
+    endpoints.forEach((endpointInfo: IEndpointElement) => {
+      menuInfo.push({
+        path: endpointInfo.name
+          .split(" ")
+          .join(" ")
+          .toLowerCase(),
+        name: StringHelper.ucFirst(endpointInfo.name)
+      });
+    });
+
+    return menuInfo;
+  }
   // Methods
   isAuthenticated() {
-    return this.token !== null;
-  }
-
-  getData() {
-    return this.endpointsInfos ? this.endpointsInfos[0] : null;
-  }
-
-  onTokenUpdate(token: string) {
-    this.token = token;
+    return !!StorageHelper.getToken();
   }
 }
 </script>
@@ -115,7 +77,7 @@ body {
   flex-flow: column;
 }
 
-.authenticated {
+.content {
   background-color: tomato;
   display: flex;
   flex: 1;
@@ -123,14 +85,26 @@ body {
   width: 100%;
 }
 
-.sidebar {
-  order: -1;
-  flex: 1;
-}
-
 .mainContent {
   background-color: yellow;
   order: 1;
-  flex: 10;
+  flex: 8;
+}
+
+#sidebarComponent {
+  order: -1;
+  flex: 1;
+  background-color: green;
+  color: white;
+}
+
+.endpointDiv {
+  padding: 10px 5px 10px 5px;
+}
+
+.title {
+  margin-bottom: 5px;
+  border: solid white;
+  border-width: 0px 0px 5px 0px;
 }
 </style>

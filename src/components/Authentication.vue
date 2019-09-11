@@ -29,6 +29,7 @@
 import { IObject, RequestTypes } from "../types";
 import { Component, Prop, Emit, Vue } from "vue-property-decorator";
 import { AtomSpinner } from "epic-spinners";
+import { apiHelper, StorageHelper } from "../helpers";
 
 @Component({
   components: {
@@ -36,9 +37,6 @@ import { AtomSpinner } from "epic-spinners";
   }
 })
 export default class Authentication extends Vue {
-  // Props
-  @Prop() private apiurl!: string;
-
   // Data
   private username: string = "";
   private passwd: string = "";
@@ -51,7 +49,7 @@ export default class Authentication extends Vue {
 
   // Computed
   get connectUrl() {
-    return `${this.apiurl}/authentication`;
+    return `authentication`;
   }
 
   // Life cycle
@@ -60,9 +58,12 @@ export default class Authentication extends Vue {
   }
 
   // Methods
-  @Emit()
-  tokenUpdated(token: string) {
-    return token;
+  tokenUpdated(json: any) {
+    StorageHelper.setToken(json.accessToken);
+    StorageHelper.setTokenExpireDate(json.expiresIn);
+
+    let redirect = this.$route.query.redirect || "/";
+    this.$router.replace(redirect as string);
   }
 
   async login() {
@@ -80,17 +81,12 @@ export default class Authentication extends Vue {
 
     const fetchParams = {
       method: "POST",
-      body: JSON.stringify(data),
-      headers: {
-        "Content-type": "application/json"
-      }
+      body: JSON.stringify(data)
     };
 
     let response: any = null;
-    let res: any = null;
     try {
-      res = await fetch(this.connectUrl, fetchParams);
-      response = await res.json();
+      response = await apiHelper.request(this.connectUrl, fetchParams);
     } catch (e) {
       console.log(e);
       this.classes = {
@@ -101,14 +97,14 @@ export default class Authentication extends Vue {
       return;
     }
     this.classes.loading = false;
-    if (res.status !== 201) {
+    if (response.status !== 201) {
       this.classes.error = true;
       this.errorMsg = `${response.message}`;
       return;
     }
 
     // emit change token
-    this.tokenUpdated(response.accessToken);
+    this.tokenUpdated(response.json);
   }
 }
 </script>
