@@ -4,7 +4,11 @@
       <h1>{{ infos ? infos.name : "" }}</h1>
     </div>
     <div class="toolbar">
-      <button>Create</button>
+      <button>
+        <router-link :to="`/${this.endpoint}/new`">
+          Create
+        </router-link>
+      </button>
       <button @click="loadItems">Reload</button>
     </div>
     <div class="loader">
@@ -30,6 +34,7 @@
           :data="item"
           :attributes="headerInfos"
           :apiurl="endpoint"
+          :endpoint-info="endpointInfo"
           class="line-element"
           @item-removed="onItemRemoved($event)"
         />
@@ -102,11 +107,19 @@ export default class ElementAdminPage extends Vue {
     }
   }
 
+  @Watch("$route", { immediate: true, deep: true })
+  onRouteUpdate(to, from) {
+    this.classes = {
+      error: false,
+      loading: true
+    };
+  }
+
   // Computed
   get endpoint() {
     return this.endpointInfo.endpoint
       ? this.endpointInfo.endpoint
-      : this.endpointInfo.name.toLowerCase();
+      : StringHelper.normalize(this.endpointInfo.name);
   }
 
   // Watcher
@@ -119,7 +132,8 @@ export default class ElementAdminPage extends Vue {
     // take first element attributes
     let printInfos: IPrintInfos = {
       exclude: [],
-      alias: []
+      alias: [],
+      required: []
     };
 
     printInfos = this.infos.print ? this.infos.print : printInfos;
