@@ -1,13 +1,35 @@
-import { IEndpointElement, IAppConfig } from './types';
+import { IEndpointElement, IAppConfig } from "./types";
 
 const app: IAppConfig = {
   apiUrl: "http://localhost:3300"
-}
+};
 
 const endpoints: IEndpointElement[] = [
   {
     name: "Peoples",
+    edit: {
+      required: [],
+      exclude: [
+        "_id",
+        "__v",
+        "lastFirstName",
+        "firstLastName"
+      ],
+      alias: [
+        {
+          value: "lastName",
+          alias: "Nom",
+          order: 0
+        },
+        {
+          value: "firstName",
+          alias: "Prénom",
+          order: 1
+        }
+      ]
+    },
     print: {
+      required: [],
       exclude: [
         "_id",
         "__v",
@@ -30,14 +52,16 @@ const endpoints: IEndpointElement[] = [
     }
   },
   {
-    name: "Tools"
+    name: "Tools",
+    edit: {
+      required: ["definition", "name", "confluence"],
+      exclude: [],
+      alias: [],
+    }
   },
   {
     name: "Users"
   }
 ];
 
-export {
-  endpoints,
-  app
-};
+export { endpoints, app };

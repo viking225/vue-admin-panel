@@ -1,26 +1,28 @@
-import { IStorage, IAuthStorage } from "../types";
+import { StorageTypes } from "../types";
 
-const defaultAuth: IAuthStorage = {
+const defaultAuth: StorageTypes.IAuthStorage = {
   token: "",
   expiresIn: ""
 };
 
-const initAuth = () =>  {
-  const auth: IAuthStorage = defaultAuth;
+const initAuth = () => {
+  const auth: StorageTypes.IAuthStorage = defaultAuth;
   if (!localStorage.auth) {
     localStorage.auth = JSON.stringify(auth);
   }
 };
 
-const getAuth = (): IAuthStorage => {
-  return localStorage.auth ? JSON.parse(localStorage.auth) as IAuthStorage : defaultAuth;
+const getAuth = (): StorageTypes.IAuthStorage => {
+  return localStorage.auth
+    ? (JSON.parse(localStorage.auth) as StorageTypes.IAuthStorage)
+    : defaultAuth;
 };
 
-const setAuth = (auth: IAuthStorage) =>  {
+const setAuth = (auth: StorageTypes.IAuthStorage) => {
   localStorage.auth = JSON.stringify(auth);
 };
 
-class Storage implements IStorage {
+class Storage implements StorageTypes.IStorage {
   setToken(token: string) {
     initAuth();
     const auth = getAuth();

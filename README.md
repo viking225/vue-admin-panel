@@ -8,12 +8,13 @@ The idea is that the panel will be connected to an REST api and user could confi
 
 ### Steps
 
-- Authentification
-- Creation of the mandatory components
-- Add main features to components
-- Use Vue router for better navigation and components usage
-- Use Vuex for better state management
-- Use some library like vue-material to look good
+- Authentification [x]
+- Creation of the mandatory components [x]
+- Add edit / create / delete actions []
+- Add dynamic fields types []
+- Use Vue router for better navigation and components usage []
+- Use Vuex for better state management []
+- Use some library like vue-material to look good []
 - Enjoy
 
 ## Project setup

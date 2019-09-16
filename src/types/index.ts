@@ -1,4 +1,5 @@
-import * as RequestTypes from './request';
+import * as RequestTypes from "./request";
+import * as StorageTypes from "./storage";
 
 interface IinfoType {
   id: Number;
@@ -14,33 +15,39 @@ interface IPrintInfosAlias {
   value: string;
   alias: string;
   order?: Number;
+  required?: Boolean;
 }
 
 interface IPrintInfos {
   exclude: string[]
   alias: IPrintInfosAlias[]
+  required: string[]
 }
 
 interface IEndpointElement {
   name: string;
   endpoint?: string;
   print?: IPrintInfos;
+  edit?: IPrintInfos;
+  operations?: {
+    find: Boolean;
+    patch: Boolean;
+    create: Boolean;
+    delete: Boolean;
+  }
 }
 
 interface IAppConfig {
   apiUrl: string;
 }
 
-interface IAuthStorage {
-  token: string;
-  expiresIn: string
-}
-
-interface IStorage {
-  setToken(token: string);
-  getToken(): string | null;
-  setTokenExpireDate(date: string);
-  getTokenExpireDate(): string | null;
-}
-
-export { IAppConfig, IStorage, IinfoType, IObject, RequestTypes, IEndpointElement, IPrintInfos, IPrintInfosAlias, IAuthStorage };
+export {
+  IAppConfig,
+  IinfoType,
+  IObject,
+  RequestTypes,
+  IEndpointElement,
+  IPrintInfos,
+  IPrintInfosAlias,
+  StorageTypes
+};
