@@ -2,7 +2,7 @@
   <div id="app">
     <div class="content">
       <div class="mainContent">
-        <router-view></router-view>
+        <router-view :key="$route.path"></router-view>
       </div>
       <div id="sidebarComponent">
         <h1 class="title">Menu</h1>
@@ -38,10 +38,7 @@ export default class App extends Vue {
 
     endpoints.forEach((endpointInfo: IEndpointElement) => {
       menuInfo.push({
-        path: endpointInfo.name
-          .split(" ")
-          .join(" ")
-          .toLowerCase(),
+        path: StringHelper.normalize(endpointInfo.name),
         name: StringHelper.ucFirst(endpointInfo.name)
       });
     });

@@ -1,9 +1,11 @@
 import VueRouter, { RouteConfig } from "vue-router";
 import { endpoints } from "./config";
 import { IEndpointElement } from "./types";
-import ElementAdminPage from "./components/ElementAdminPage.vue";
+import { StorageHelper, StringHelper } from "./helpers";
+
+import ElementAdminPage from "./components/ListAdminPage.vue";
 import Authentication from "./components/Authentication.vue";
-import { StorageHelper } from "./helpers";
+import EditAdminPage from "./components/EditAdminPage.vue";
 
 if (endpoints.length === 0) {
   throw new Error("App doesnt got any endpoint configured");
@@ -31,22 +33,29 @@ const requireAuth = (to, from, next) => {
 };
 
 // Use config to generate routes
-const routes: RouteConfig[] = endpoints.map(
-  (endpointInfo: IEndpointElement) => {
-    const route = endpointInfo.name
-      .split(" ")
-      .join("_")
-      .toLowerCase();
-    return {
-      path: `/${route}`,
-      component: ElementAdminPage,
-      props: {
-        endpointInfo
-      },
-      beforeEnter: requireAuth
-    };
-  }
-);
+const routes: RouteConfig[] = [];
+endpoints.forEach((endpointInfo: IEndpointElement) => {
+  const route = StringHelper.normalize(endpointInfo.name);
+
+  // Main route
+  routes.push({
+    name: route,
+    path: `/${route}`,
+    component: ElementAdminPage,
+    props: {
+      endpointInfo
+    },
+    beforeEnter: requireAuth
+  });
+
+  routes.push({
+    path: `/${route}/:id`,
+    component: EditAdminPage,
+    props: {
+      editInfos: endpointInfo
+    }
+  });
+});
 
 // login
 routes.push({
