@@ -63,7 +63,7 @@ import {
   IPrintInfosAlias
 } from "../types";
 import { StringHelper, StorageHelper, apiHelper } from "../helpers";
-import LineEditElement from "./LineEditElement.vue";
+import LineEditElement from "../components/LineEditElement.vue";
 import { FlowerSpinner } from "epic-spinners";
 
 @Component({

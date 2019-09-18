@@ -1,11 +1,13 @@
 import VueRouter, { RouteConfig } from "vue-router";
 import { endpoints } from "./config";
-import { IEndpointElement } from "./types";
+import { IEndpointElement, IObject } from "./types";
 import { StorageHelper, StringHelper } from "./helpers";
 
-import ElementAdminPage from "./components/ListAdminPage.vue";
-import Authentication from "./components/Authentication.vue";
-import EditAdminPage from "./components/EditAdminPage.vue";
+import ElementAdminPage from "./pages/ListAdminPage.vue";
+import Authentication from "./pages/Authentication.vue";
+import EditAdminPage from "./pages/EditAdminPage.vue";
+import DashboardPage from "./pages/Dashboard.vue";
+import App from "./App.vue";
 
 if (endpoints.length === 0) {
   throw new Error("App doesnt got any endpoint configured");
@@ -34,21 +36,41 @@ const requireAuth = (to, from, next) => {
 
 // Use config to generate routes
 const routes: RouteConfig[] = [];
+
+// login
+routes.push({
+  path: "/login",
+  component: Authentication
+});
+
+// Construct authentified:
+const children: RouteConfig[] = [];
+
+// Dynamic routes
 endpoints.forEach((endpointInfo: IEndpointElement) => {
   const route = StringHelper.normalize(endpointInfo.name);
 
-  // Main route
-  routes.push({
+  const findRoute = {
     name: route,
     path: `/${route}`,
     component: ElementAdminPage,
     props: {
       endpointInfo
-    },
-    beforeEnter: requireAuth
-  });
+    }
+  };
 
-  routes.push({
+  // Default route
+  // Use first elemeent in config as default
+  if (children.length === 0) {
+    children.push({
+      ...findRoute,
+      path: ""
+    });
+  }
+  // Main route
+  children.push(findRoute);
+
+  children.push({
     path: `/${route}/:id`,
     component: EditAdminPage,
     props: {
@@ -57,10 +79,12 @@ endpoints.forEach((endpointInfo: IEndpointElement) => {
   });
 });
 
-// login
+// Authentified routes
 routes.push({
-  path: "/login",
-  component: Authentication
+  path: "",
+  component: DashboardPage,
+  beforeEnter: requireAuth,
+  children
 });
 
 export default new VueRouter({ routes });
