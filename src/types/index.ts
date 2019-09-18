@@ -1,4 +1,5 @@
-import * as RequestTypes from './request';
+import * as RequestTypes from "./request";
+import * as StorageTypes from "./storage";
 
 interface IinfoType {
   id: Number;
@@ -14,17 +15,39 @@ interface IPrintInfosAlias {
   value: string;
   alias: string;
   order?: Number;
+  required?: Boolean;
 }
 
 interface IPrintInfos {
   exclude: string[]
   alias: IPrintInfosAlias[]
+  required: string[]
 }
 
 interface IEndpointElement {
   name: string;
   endpoint?: string;
   print?: IPrintInfos;
+  edit?: IPrintInfos;
+  operations?: {
+    find: Boolean;
+    patch: Boolean;
+    create: Boolean;
+    delete: Boolean;
+  }
 }
 
-export { IinfoType, IObject, RequestTypes, IEndpointElement, IPrintInfos, IPrintInfosAlias };
+interface IAppConfig {
+  apiUrl: string;
+}
+
+export {
+  IAppConfig,
+  IinfoType,
+  IObject,
+  RequestTypes,
+  IEndpointElement,
+  IPrintInfos,
+  IPrintInfosAlias,
+  StorageTypes
+};
