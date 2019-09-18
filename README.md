@@ -10,11 +10,12 @@ The idea is that the panel will be connected to an REST api and user could confi
 
 - Authentification [x]
 - Creation of the mandatory components [x]
-- Add edit / create / delete actions []
-- Add dynamic fields types []
-- Use Vue router for better navigation and components usage []
+- Use Vue router for better navigation and components usage [x]
+- Add edit / create / delete actions [x]
 - Use Vuex for better state management []
+- Find a way to have dynamic flex column size []
 - Use some library like vue-material to look good []
+- Add dynamic fields types []
 - Enjoy
 
 ## Project setup

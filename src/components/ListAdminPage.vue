@@ -239,7 +239,7 @@ export default class ElementAdminPage extends Vue {
     await this.loadItems();
 
     // If not Item go to previous page
-    if (this.pageInfos.actual > 1 && this.items.length === 0){
+    if (this.pageInfos.actual > 1 && this.items.length === 0) {
       this.pageInfos.actual -= 1;
       await this.loadItems();
     }

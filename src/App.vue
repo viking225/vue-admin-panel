@@ -93,6 +93,7 @@ body {
   flex: 1;
   background-color: green;
   color: white;
+  padding: 0 5%;
 }
 
 .endpointDiv {

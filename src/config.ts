@@ -56,11 +56,24 @@ const endpoints: IEndpointElement[] = [
     edit: {
       required: ["definition", "name", "confluence"],
       exclude: [],
-      alias: [],
+      alias: []
     }
   },
   {
-    name: "Users"
+    name: "Users",
+    edit: {
+      required: ["password", "userName"],
+      exclude: [],
+      alias: [
+        {
+          value: "password",
+          alias: "Password"
+        }
+      ]
+    }
+  },
+  {
+    name: "Roles"
   }
 ];
 
