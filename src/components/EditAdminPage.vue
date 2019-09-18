@@ -74,7 +74,7 @@ export default class EditAdminPage extends Vue {
     } else {
       // Find header infos with another way
       const item = await this.findFirstOfItems();
-      if (item._id !== undefined) {
+      if (Object.keys(item).length > 0) {
         this.updateFieldsInfos(item);
       }
 
@@ -108,7 +108,25 @@ export default class EditAdminPage extends Vue {
   // Method
   updateFieldsInfos(data: IObject) {
     console.log("launch update");
-    const result = Object.keys(data).map(attribute => {
+
+    // Construct attributes array with content of alias & keys of data
+    let confAttributes: string[] = [];
+    const dataAttributes: string[] = Object.keys(data);
+
+    if (this.infos.edit && this.infos.edit.alias.length > 0) {
+      confAttributes = this.infos.edit.alias.map(e => e.value);
+    }
+
+    // Verify that there are not multiple occurences and merge
+    confAttributes.forEach(attr => {
+      const occurence = dataAttributes.find(dataAttr => dataAttr === attr);
+      if (!occurence) {
+        dataAttributes.push(attr);
+      }
+    });
+
+    // Loop through attributes to construct fields
+    const result = dataAttributes.map(attribute => {
       let alias = StringHelper.ucFirst(attribute),
         value = attribute,
         required = false,
@@ -117,7 +135,7 @@ export default class EditAdminPage extends Vue {
       let excluedAttributeInfos = false;
       let excluded = ["_id", "__v"];
       let requiredAttributes: string[] = [];
-      // find in aliases
+
       if (this.infos.edit) {
         excluded =
           this.infos.edit.exclude.length > 0
