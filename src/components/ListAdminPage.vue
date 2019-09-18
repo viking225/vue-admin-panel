@@ -28,8 +28,7 @@
       </div>
       <transition-group name="list" tag="div" class="table-content">
         <line-edit-element
-          v-for="(item, index) in items"
-          :index="index"
+          v-for="item in items"
           :key="`row-${item._id}`"
           :data="item"
           :attributes="headerInfos"
@@ -90,7 +89,7 @@ export default class ElementAdminPage extends Vue {
     max: 1
   };
   private requestParams = {
-    limit: 10
+    limit: 9
   };
   private errorMsg: string | null = null;
   private classes: IObject = {
@@ -235,13 +234,14 @@ export default class ElementAdminPage extends Vue {
   }
 
   // Events
-  onItemRemoved(id: string) {
-    console.log(id);
-    // find in item
-    const index = this.items.findIndex(item => item._id === id);
-    console.log(index);
-    if (index) {
-      this.items.splice(index, 1);
+  async onItemRemoved(id: string) {
+    // reload items
+    await this.loadItems();
+
+    // If not Item go to previous page
+    if (this.pageInfos.actual > 1 && this.items.length === 0){
+      this.pageInfos.actual -= 1;
+      await this.loadItems();
     }
   }
 
