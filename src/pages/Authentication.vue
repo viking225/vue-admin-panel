@@ -7,12 +7,14 @@
         name="username"
         placeholder="Username"
         v-model="username"
+        @keyup.enter="onEnter"
       />
       <input
         type="password"
         name="password"
         placeholder="Password"
         v-model="passwd"
+        @keyup.enter="onEnter"
       />
       <button @click="login" class="connectButton">Connect</button>
       <div class="loader">
@@ -46,6 +48,27 @@ export default class Authentication extends Vue {
   };
 
   private errorMsg = "";
+  // events
+  onEnter({ target }) {
+    let inputs = document.querySelectorAll(".loginContainer input");
+
+    let emptyField = false;
+    inputs.forEach(element => {
+      if (emptyField) {
+        return;
+      }
+      const input = element as HTMLInputElement;
+      if (!input.value) {
+        console.log("focus");
+        input.focus();
+        emptyField = true;
+      }
+    });
+
+    if (!emptyField) {
+      this.login();
+    }
+  }
 
   // Computed
   get connectUrl() {
@@ -99,7 +122,7 @@ export default class Authentication extends Vue {
     this.classes.loading = false;
     if (response.status !== 201) {
       this.classes.error = true;
-      this.errorMsg = `${response.message}`;
+      this.errorMsg = `${response.json.message}`;
       return;
     }
 
