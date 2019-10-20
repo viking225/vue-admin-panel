@@ -3,4 +3,11 @@ interface IAuthRequest {
   password: string;
 }
 
-export { IAuthRequest }
+enum ERequestState {
+  Loading,
+  Error,
+  Success,
+  Base
+}
+
+export { IAuthRequest, ERequestState };

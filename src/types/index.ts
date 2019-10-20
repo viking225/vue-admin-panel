@@ -1,5 +1,6 @@
 import * as RequestTypes from "./request";
 import * as StorageTypes from "./storage";
+import { IStore } from "./store";
 
 interface IinfoType {
   id: Number;
@@ -49,5 +50,6 @@ export {
   IEndpointElement,
   IPrintInfos,
   IPrintInfosAlias,
-  StorageTypes
+  StorageTypes,
+  IStore
 };
