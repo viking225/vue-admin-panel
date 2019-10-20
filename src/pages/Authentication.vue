@@ -28,6 +28,7 @@
 </template>
 
 <script lang="ts">
+import { Action } from "vuex-class";
 import { IObject, RequestTypes } from "../types";
 import { Component, Prop, Emit, Vue } from "vue-property-decorator";
 import { AtomSpinner } from "epic-spinners";
@@ -39,6 +40,9 @@ import { apiHelper, StorageHelper } from "../helpers";
   }
 })
 export default class Authentication extends Vue {
+  // Store action
+  @Action("auth_request") login;
+
   // Data
   private username: string = "";
   private passwd: string = "";
@@ -71,9 +75,6 @@ export default class Authentication extends Vue {
   }
 
   // Computed
-  get connectUrl() {
-    return `authentication`;
-  }
 
   // Life cycle
   mounted() {
@@ -82,52 +83,8 @@ export default class Authentication extends Vue {
 
   // Methods
   tokenUpdated(json: any) {
-    StorageHelper.setToken(json.accessToken);
-    StorageHelper.setTokenExpireDate(json.expiresIn);
-
     let redirect = this.$route.query.redirect || "/";
     this.$router.replace(redirect as string);
-  }
-
-  async login() {
-    // Change classes
-    this.classes = {
-      loading: true,
-      error: false
-    };
-
-    // launch fetch to apiUrl
-    const data: RequestTypes.IAuthRequest = {
-      userName: this.username,
-      password: this.passwd
-    };
-
-    const fetchParams = {
-      method: "POST",
-      body: JSON.stringify(data)
-    };
-
-    let response: any = null;
-    try {
-      response = await apiHelper.request(this.connectUrl, fetchParams);
-    } catch (e) {
-      console.log(e);
-      this.classes = {
-        error: true,
-        loading: false
-      };
-      this.errorMsg = "An unknown error happened";
-      return;
-    }
-    this.classes.loading = false;
-    if (response.status !== 201) {
-      this.classes.error = true;
-      this.errorMsg = `${response.json.message}`;
-      return;
-    }
-
-    // emit change token
-    this.tokenUpdated(response.json);
   }
 }
 </script>
