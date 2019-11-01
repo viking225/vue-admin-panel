@@ -16,7 +16,7 @@
         v-model="passwd"
         @keyup.enter="onEnter"
       />
-      <button @click="login" class="connectButton">Connect</button>
+      <button @click="launchLogin" class="connectButton">Connect</button>
       <div class="loader">
         <atom-spinner :animation-duration="1500" :size="64" color="#e50cba" />
       </div>
@@ -28,11 +28,16 @@
 </template>
 
 <script lang="ts">
-import { Action } from "vuex-class";
+import { Action, namespace } from "vuex-class";
 import { IObject, RequestTypes } from "../types";
-import { Component, Prop, Emit, Vue } from "vue-property-decorator";
+import { Component, Prop, Watch, Emit, Vue } from "vue-property-decorator";
 import { AtomSpinner } from "epic-spinners";
 import { apiHelper, StorageHelper } from "../helpers";
+
+// Types
+const statusValues = RequestTypes.ERequestState;
+// Modules
+const authModule = namespace("auth");
 
 @Component({
   components: {
@@ -40,8 +45,14 @@ import { apiHelper, StorageHelper } from "../helpers";
   }
 })
 export default class Authentication extends Vue {
-  // Store action
-  @Action("auth_request") login;
+  // Store
+  // Action
+  @authModule.Action("auth_request") login;
+  // State
+  @authModule.State("status") status;
+  @authModule.State("errorMessage") errorMsg;
+  // Getters
+  @authModule.Getter("isAuthenticated") isAuthenticated;
 
   // Data
   private username: string = "";
@@ -51,7 +62,20 @@ export default class Authentication extends Vue {
     loading: false
   };
 
-  private errorMsg = "";
+  // Watcher
+  @Watch("status")
+  onStatusChanged(
+    val: RequestTypes.ERequestState,
+    oldVal: RequestTypes.ERequestState
+  ) {
+    this.classes.loading = val === statusValues.Loading;
+    this.classes.error = val === statusValues.Error;
+
+    if (val === statusValues.Success) {
+      this.tokenUpdated();
+    }
+  }
+
   // events
   onEnter({ target }) {
     let inputs = document.querySelectorAll(".loginContainer input");
@@ -70,7 +94,7 @@ export default class Authentication extends Vue {
     });
 
     if (!emptyField) {
-      this.login();
+      this.launchLogin();
     }
   }
 
@@ -79,12 +103,25 @@ export default class Authentication extends Vue {
   // Life cycle
   mounted() {
     this.classes.error = false;
+
+    console.log("mounted");
+    console.log(this.isAuthenticated);
+    if (this.isAuthenticated) {
+      this.tokenUpdated();
+    }
   }
 
   // Methods
-  tokenUpdated(json: any) {
+  tokenUpdated() {
     let redirect = this.$route.query.redirect || "/";
     this.$router.replace(redirect as string);
+  }
+  launchLogin() {
+    const user = {
+      username: this.username,
+      password: this.passwd
+    };
+    this.login(user);
   }
 }
 </script>

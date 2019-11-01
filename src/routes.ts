@@ -1,6 +1,6 @@
 import VueRouter, { RouteConfig } from "vue-router";
-import { IEndpointElement, IObject } from "@/types";
-import { StorageHelper, StringHelper } from "@/helpers";
+import { IEndpointElement } from "@/types";
+import { StringHelper } from "@/helpers";
 
 import ListAdminPage from "@/pages/ListAdminPage.vue";
 import Authentication from "@/pages/Authentication.vue";
@@ -15,11 +15,10 @@ if (store.state.endpoints.length === 0) {
 
 // Check auth
 const requireAuth = (to, from, next) => {
-
-  if (store.getters.auth.isAuthenticated()) {
-    return next()
+  const isAuthenticated = store.getters["auth/isAuthenticated"];
+  if (isAuthenticated) {
+    return next();
   }
-  
   next({
     path: "/login",
     query: { redirect: to.fullPath }

@@ -1,5 +1,5 @@
 import { IAuthStore } from "@/types/store";
-import { RequestTypes } from "@/types"
+import { RequestTypes } from "@/types";
 import { StorageHelper, apiHelper } from "@/helpers";
 
 const state: IAuthStore = {
@@ -9,16 +9,22 @@ const state: IAuthStore = {
   },
   status: RequestTypes.ERequestState.Base,
   errorMessage: ""
-}
+};
+
 const actions = {
-  async auth_request({commit}, user) {
+  async auth_request({ commit, state }, { username, password }) {
+    commit("auth_request");
     const fetchParams = {
       method: "POST",
-      body: JSON.stringify(user)
-    }
+      body: JSON.stringify({
+        userName: username,
+        password
+      })
+    };
 
     let response: any = null;
     try {
+      console.log(fetchParams);
       response = await apiHelper.request("authentication", fetchParams);
     } catch (e) {
       console.log(e);
@@ -30,23 +36,29 @@ const actions = {
       commit("auth_error", response.json.message);
       return;
     }
-    commit("auth_success");
+
+    commit("auth_success", response.json);
   }
 };
 const mutations = {
-  auth_request: (state) =>  {
+  auth_request: state => {
     state.status = RequestTypes.ERequestState.Loading;
   },
-  auth_success: (state) =>  {
+  auth_success: (state, response) => {
+    const { accessToken, expiresIn } = response;
+    StorageHelper.setToken(accessToken);
+    StorageHelper.setTokenExpireDate(expiresIn);
+    
     state.status = RequestTypes.ERequestState.Success;
   },
-  auth_error: (state, msg) =>  {
+  auth_error: (state, msg) => {
     state.status = RequestTypes.ERequestState.Error;
     state.errorMessage = msg;
   }
 };
 const getters = {
-  isAuthenticated: ({token}: IAuthStore): Boolean =>  {
+  isAuthenticated: ({ token }: IAuthStore): Boolean => {
+    console.log('token:', token);
     if (!token || !token.value || !token.expiresIn) {
       return false;
     }
@@ -58,8 +70,9 @@ const getters = {
 };
 
 export default {
+  namespaced: true,
   state,
   actions,
   mutations,
   getters
-}
+};
