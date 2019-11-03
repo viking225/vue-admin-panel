@@ -9,7 +9,7 @@
           Create
         </router-link>
       </button>
-      <button @click="loadItems">Reload</button>
+      <button @click="loadItems(endpoint)">Reload</button>
     </div>
     <div class="loader">
       <flower-spinner :animation-duration="1500" :size="64" color="#e50cba" />
@@ -33,7 +33,6 @@
           :data="item"
           :attributes="headerInfos"
           :apiurl="endpoint"
-          :endpoint-info="endpointInfo"
           class="line-element"
           @item-removed="onItemRemoved($event)"
         />
@@ -55,16 +54,23 @@
 </template>
 
 <script lang="ts">
+import { Getter, State, Action, namespace } from "vuex-class";
 import { Vue, Component, Prop, Watch } from "vue-property-decorator";
 import {
   IEndpointElement,
   IObject,
   IPrintInfos,
-  IPrintInfosAlias
+  IPrintInfosAlias,
+  RequestTypes
 } from "../types";
 import { StringHelper, StorageHelper, apiHelper } from "../helpers";
 import LineEditElement from "../components/LineEditElement.vue";
 import { FlowerSpinner } from "epic-spinners";
+
+// Types
+const statusValues = RequestTypes.ERequestState;
+// Modules
+const itemStore = namespace("item");
 
 @Component({
   components: {
@@ -72,26 +78,25 @@ import { FlowerSpinner } from "epic-spinners";
     LineEditElement
   }
 })
-export default class ElementAdminPage extends Vue {
-  // Props
-  @Prop() private endpointInfo!: IEndpointElement;
+export default class ListAdminPage extends Vue {
+  // Mutations
+  @itemStore.Mutation("changePage") changePage;
+  // Action
+  @itemStore.Action("loadItems") loadItems;
+  // Getter
+  @Getter("getEndpointInfoByName") getEndpointInfo;
+  // State
+  @itemStore.State("pageInfos") pageInfos;
+  @itemStore.State("actualItems") items;
+  @itemStore.State("status") status;
+  @itemStore.State("errorMessgae") errorMsg;
 
-  // data
-  // Array of attribute to print
-  private items: IObject[] = [];
-  private infos: IEndpointElement = this.endpointInfo;
+  // Data
+  private infos: IEndpointElement | null = null;
   private headerInfos: {
     alias: string;
     value: string;
   }[] = [];
-  private pageInfos: { actual: number; max: number } = {
-    actual: 1,
-    max: 1
-  };
-  private requestParams = {
-    limit: 9
-  };
-  private errorMsg: string | null = null;
   private classes: IObject = {
     loading: false,
     error: false
@@ -102,12 +107,25 @@ export default class ElementAdminPage extends Vue {
   mounted() {
     const token = StorageHelper.getToken();
     if (token) {
-      this.loadItems();
+      this.loadItems(this.endpoint);
     }
   }
 
+  // Watcher
+  @Watch("status")
+  onStatusChanged(
+    val: RequestTypes.ERequestState,
+    oldVal: RequestTypes.ERequestState
+  ) {
+    this.classes.loading = val === statusValues.Loading;
+    this.classes.error = val === statusValues.Error;
+  }
   @Watch("$route", { immediate: true, deep: true })
   onRouteUpdate(to, from) {
+    // get info from store
+    this.infos = this.getEndpointInfo(StringHelper.normalize(to.name));
+
+    // Reset class object
     this.classes = {
       error: false,
       loading: true
@@ -116,9 +134,12 @@ export default class ElementAdminPage extends Vue {
 
   // Computed
   get endpoint() {
-    return this.endpointInfo.endpoint
-      ? this.endpointInfo.endpoint
-      : StringHelper.normalize(this.endpointInfo.name);
+    if (!this.infos) {
+      return "";
+    }
+    return this.infos.endpoint
+      ? this.infos.endpoint
+      : StringHelper.normalize(this.infos.name);
   }
 
   // Watcher
@@ -135,7 +156,7 @@ export default class ElementAdminPage extends Vue {
       required: []
     };
 
-    printInfos = this.infos.print ? this.infos.print : printInfos;
+    printInfos = this.infos && this.infos.print ? this.infos.print : printInfos;
 
     let result: IPrintInfosAlias[] = [];
     result = Object.keys(this.items[0]).reduce((arr, attribute) => {
@@ -179,69 +200,15 @@ export default class ElementAdminPage extends Vue {
     this.headerInfos = result;
   }
 
-  // Methods
-  getPageNumber(total: number, nbrItems: number): number {
-    return total ? Math.ceil(total / nbrItems) : 0;
-  }
-
-  async loadItems() {
-    this.classes = {
-      error: false,
-      loading: true
-    };
-    const fetchParams = {
-      method: "GET"
-    };
-
-    let fetchUrl = this.endpoint;
-    const $skip =
-      this.pageInfos.actual * this.requestParams.limit -
-      this.requestParams.limit;
-    const findParams = {
-      $limit: this.requestParams.limit,
-      $skip
-    };
-
-    let count = 0;
-    fetchUrl = Object.keys(findParams).reduce((url, paramKey) => {
-      count++;
-      return count === 1
-        ? `${url}?${paramKey}=${findParams[paramKey]}`
-        : `${url}&${paramKey}=${findParams[paramKey]}`;
-    }, `${fetchUrl}`);
-
-    let response: any = null;
-    try {
-      response = await apiHelper.request(fetchUrl, fetchParams);
-    } catch (e) {
-      this.classes = {
-        error: true,
-        loading: false
-      };
-      this.errorMsg = "Error Unknown";
-      return;
-    }
-    this.classes.loading = false;
-    if (response.status !== 200) {
-      this.classes.error = true;
-      this.errorMsg = `${response.message}`;
-      return;
-    }
-    const { data, total, limit, skip } = response.json;
-    this.pageInfos.max = this.getPageNumber(total, limit);
-    this.pageInfos.actual = skip < limit ? 1 : Math.ceil(skip / limit) + 1;
-    this.items = data;
-  }
-
   // Events
   async onItemRemoved(id: string) {
     // reload items
-    await this.loadItems();
+    await this.loadItems(this.endpoint);
 
     // If not Item go to previous page
     if (this.pageInfos.actual > 1 && this.items.length === 0) {
-      this.pageInfos.actual -= 1;
-      await this.loadItems();
+      this.changePage(this.pageInfos.actual - 1);
+      await this.loadItems(this.endpoint);
     }
   }
 
@@ -249,8 +216,9 @@ export default class ElementAdminPage extends Vue {
     if (isActual) {
       return;
     }
-    this.pageInfos.actual = pageNumber;
-    this.loadItems();
+    console.log(pageNumber);
+    this.changePage(pageNumber);
+    this.loadItems(this.endpoint);
   }
 }
 </script>
