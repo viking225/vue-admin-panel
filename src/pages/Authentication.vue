@@ -113,8 +113,8 @@ export default class Authentication extends Vue {
 
   // Methods
   tokenUpdated() {
-    let redirect = this.$route.query.redirect || "/";
-    this.$router.replace(redirect as string);
+    const redirect = this.$route.query.redirect || "/";
+    this.$router.push(redirect as string);
   }
   launchLogin() {
     const user = {

@@ -12,7 +12,7 @@ const state: IAuthStore = {
 };
 
 const actions = {
-  async auth_request({ commit, state }, { username, password }) {
+  async auth_request({ commit }, { username, password }) {
     commit("auth_request");
     const fetchParams = {
       method: "POST",
@@ -48,6 +48,11 @@ const mutations = {
     const { accessToken, expiresIn } = response;
     StorageHelper.setToken(accessToken);
     StorageHelper.setTokenExpireDate(expiresIn);
+    
+    state.token = {
+      value: accessToken,
+      expiresIn
+    };
     
     state.status = RequestTypes.ERequestState.Success;
   },

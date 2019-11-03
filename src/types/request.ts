@@ -1,6 +1,13 @@
+import { IObject } from '.';
+
 interface IAuthRequest {
   userName: string;
   password: string;
+}
+
+interface IResponse {
+  status: number;
+  json: IObject
 }
 
 enum ERequestState {
@@ -10,4 +17,4 @@ enum ERequestState {
   Base
 }
 
-export { IAuthRequest, ERequestState };
+export { IAuthRequest, ERequestState, IResponse };
