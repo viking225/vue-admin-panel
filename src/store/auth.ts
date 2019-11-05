@@ -48,12 +48,11 @@ const mutations = {
     const { accessToken, expiresIn } = response;
     StorageHelper.setToken(accessToken);
     StorageHelper.setTokenExpireDate(expiresIn);
-    
     state.token = {
       value: accessToken,
       expiresIn
     };
-    
+
     state.status = RequestTypes.ERequestState.Success;
   },
   auth_error: (state, msg) => {
@@ -63,7 +62,6 @@ const mutations = {
 };
 const getters = {
   isAuthenticated: ({ token }: IAuthStore): Boolean => {
-    console.log('token:', token);
     if (!token || !token.value || !token.expiresIn) {
       return false;
     }

@@ -15,6 +15,9 @@
       <flower-spinner :animation-duration="1500" :size="64" color="#e50cba" />
     </div>
     <div class="errorMsg">{{ errorMsg ? errorMsg : "" }}</div>
+    <div class="no-content" v-show="headerInfos.length == 0">
+      Pas de contenu
+    </div>
     <div class="table-element" v-show="headerInfos.length">
       <div class="table-header line-element">
         <div
@@ -111,6 +114,16 @@ export default class ListAdminPage extends Vue {
     }
   }
 
+  // Computed
+  get endpoint() {
+    if (!this.infos) {
+      return "";
+    }
+    return this.infos.endpoint
+      ? this.infos.endpoint
+      : StringHelper.normalize(this.infos.name);
+  }
+
   // Watcher
   @Watch("status")
   onStatusChanged(
@@ -123,7 +136,8 @@ export default class ListAdminPage extends Vue {
   @Watch("$route", { immediate: true, deep: true })
   onRouteUpdate(to, from) {
     // get info from store
-    this.infos = this.getEndpointInfo(StringHelper.normalize(to.name));
+    this.infos = this.getEndpointInfo(to.name);
+    this.changePage(1);
 
     // Reset class object
     this.classes = {
@@ -132,17 +146,6 @@ export default class ListAdminPage extends Vue {
     };
   }
 
-  // Computed
-  get endpoint() {
-    if (!this.infos) {
-      return "";
-    }
-    return this.infos.endpoint
-      ? this.infos.endpoint
-      : StringHelper.normalize(this.infos.name);
-  }
-
-  // Watcher
   @Watch("items")
   refreshHeaderAttributes() {
     if (this.items.length === 0) {

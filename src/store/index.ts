@@ -14,10 +14,11 @@ const store: Store<IStore> = new Vuex.Store({
     item: itemStore
   },
   state: {
-    endpoints,
+    endpoints
   },
   getters: {
     getEndpointInfoByName: state => (name): IEndpointElement | null => {
+      name = StringHelper.normalize(name);
       const endpoint = state.endpoints.find(
         endpoint => StringHelper.normalize(endpoint.name) === name
       );

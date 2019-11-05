@@ -1,5 +1,5 @@
 <template>
-  <div class="line-edit-element" :class="classes">
+  <div class="line-edit-element">
     <div
       class="table-cell"
       v-for="(header, index) in attributes"
@@ -10,7 +10,7 @@
     </div>
     <div class="table-cell action" v-show="show">
       <button>
-        <router-link :to="`/${endpointPath}/${this.data._id}`">
+        <router-link :to="`/${this.apiurl}`">
           Edit
         </router-link>
       </button>
@@ -20,15 +20,18 @@
 </template>
 
 <script lang="ts">
+import { namespace } from "vuex-class";
 import { Vue, Component, Prop, Emit } from "vue-property-decorator";
 import { IObject, IEndpointElement } from "../types";
 import { apiHelper, StringHelper } from "../helpers";
 
+const itemStore = namespace("item");
+
 @Component({})
 export default class LineEditElment extends Vue {
+  // Getter
+  @itemStore.Action("deleteItem") deleteItem;
   // Props
-  @Prop() private endpointInfo!: IEndpointElement;
-  @Prop() private token!: string;
   @Prop() private apiurl!: string;
   @Prop() private data!: IObject;
   @Prop() private attributes!: { alias: string; value: string }[];
@@ -37,10 +40,6 @@ export default class LineEditElment extends Vue {
   // Data
   private show: boolean = true;
   private errorMsg: string = "";
-  private classes: IObject = {
-    error: false,
-    loading: false
-  };
   // Lifecycle
   // Event
   @Emit()
@@ -48,48 +47,12 @@ export default class LineEditElment extends Vue {
     return id;
   }
   // Computed
-  get endpoint() {
-    return `${this.endpointPath}/${this.data._id}`;
-  }
 
-  get endpointPath() {
-    return StringHelper.normalize(this.endpointInfo.name);
-  }
   // Methods
   async onDelete() {
-    if (this.classes.loading) {
-      return;
-    }
-    this.classes = {
-      error: false,
-      loading: true
-    };
-
-    const fetchParams = {
-      method: "DELETE"
-    };
-
-    let response: any = null;
-    try {
-      response = await apiHelper.request(this.endpoint, fetchParams);
-    } catch (e) {
-      this.classes = {
-        error: true,
-        loading: false
-      };
-      this.errorMsg = "Unknown error";
-      return;
-    }
-    this.classes.loading = false;
-    if (response.status !== 200) {
-      this.classes.error = true;
-      this.errorMsg = `${response.json.message}`;
-    }
-
-    if (response.json._id === this.data._id) {
-      // Emit remove element to elementAdminPage
-      this.itemRemoved(response.json._id);
-    }
+    console.log(this.data._id);
+    await this.deleteItem({ endpoint: this.apiurl, id: this.data._id });
+    this.itemRemoved(this.data._id);
   }
 }
 </script>
