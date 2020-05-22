@@ -218,7 +218,8 @@ export default class ListAdminPage extends Vue {
 .element-admin-page {
   display: flex;
   flex-flow: column;
-  background-color: aqua;
+  background-color: #2c3e50;
+  color: white;
   align-content: center;
   min-height: 100%;
 }
@@ -264,6 +265,7 @@ export default class ListAdminPage extends Vue {
 }
 
 .table-element {
+  color: black;
   margin: 10px 5px 10px 5px;
   display: flex;
   flex-flow: column;

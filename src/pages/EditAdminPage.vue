@@ -325,7 +325,8 @@ export default class EditAdminPage extends Vue {
 </script>
 <style scoped>
 .edit-admin-page {
-  background: greenyellow;
+  background: #2c3e50;
+  color: white;
   display: flex;
   min-height: 100%;
   padding: 0% 10%;

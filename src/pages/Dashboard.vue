@@ -5,14 +5,10 @@
     </div>
     <div id="sidebarComponent">
       <h1 class="title">Menu</h1>
-      <div
-        v-for="(endpoint, index) in menuInfo"
-        :key="`endpoint-${index}`"
-        class="endpointDiv"
-      >
-        <router-link :to="`/${endpoint.path}`">
-          {{ endpoint.name }}
-        </router-link>
+      <div class="endpoints">
+        <div v-for="(endpoint, index) in menuInfo" :key="`endpoint-${index}`" class="endpointDiv">
+          <router-link :to="`/${endpoint.path}`">{{ endpoint.name }}</router-link>
+        </div>
       </div>
     </div>
   </div>
@@ -33,7 +29,7 @@ export default class Dashboard extends Vue {
     endpoints.forEach((endpointInfo: IEndpointElement) => {
       menuInfo.push({
         path: StringHelper.normalize(endpointInfo.name),
-        name: StringHelper.ucFirst(endpointInfo.name)
+        name: StringHelper.ucFirst(endpointInfo.name),
       });
     });
 
@@ -44,7 +40,6 @@ export default class Dashboard extends Vue {
 
 <style scopped>
 #dashboard {
-  background-color: tomato;
   display: flex;
   flex: 1;
   flex-direction: row;
@@ -59,14 +54,23 @@ export default class Dashboard extends Vue {
 
 #sidebarComponent {
   order: -1;
-  flex: 1;
-  background-color: green;
+  flex: 0 0 200px;
+  background-color: #2c3e50;
   color: white;
+  border-right: 5px solid white;
+}
+
+.endpoints {
   padding: 0 5%;
 }
 
 .endpointDiv {
   padding: 10px 5px 10px 5px;
+  color: white;
+}
+
+.endpointDiv a {
+  color: white;
 }
 
 .title {
