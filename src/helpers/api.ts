@@ -1,10 +1,13 @@
 import { app } from "../config";
 import { StorageHelper } from ".";
-import { IResponse } from '@/types/request';
+import { IResponse } from "@/types/request";
 
-const request = async (endpoint: string, fetchParams: RequestInit = {}): Promise<IResponse> => {
+const request = async (
+  endpoint: string,
+  fetchParams: RequestInit = {}
+): Promise<IResponse> => {
   const headers = {
-    "Content-type": "application/json"
+    "Content-type": "application/json",
   };
   const token = StorageHelper.getToken();
   headers["Authorization"] = token ? token : undefined;
@@ -13,12 +16,12 @@ const request = async (endpoint: string, fetchParams: RequestInit = {}): Promise
     fetchParams.headers = headers;
   }
 
-  const res = <Response> await fetch(`${app.apiUrl}/${endpoint}`, fetchParams);
+  const res = <Response>await fetch(`${app.apiUrl}/${endpoint}`, fetchParams);
   const response = await res.json();
 
   return {
     status: res ? res.status : 500,
-    json: response
+    json: response,
   };
 };
 

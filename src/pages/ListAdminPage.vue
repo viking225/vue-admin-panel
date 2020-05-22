@@ -5,9 +5,7 @@
     </div>
     <div class="toolbar">
       <button>
-        <router-link :to="`/${this.endpoint}/new`">
-          Create
-        </router-link>
+        <router-link :to="`/${this.endpoint}/new`">Create</router-link>
       </button>
       <button @click="loadItems(endpoint)">Reload</button>
     </div>
@@ -15,18 +13,10 @@
       <flower-spinner :animation-duration="1500" :size="64" color="#e50cba" />
     </div>
     <div class="errorMsg">{{ errorMsg ? errorMsg : "" }}</div>
-    <div class="no-content" v-show="headerInfos.length == 0">
-      Pas de contenu
-    </div>
+    <div class="no-content" v-show="headerInfos.length == 0">Pas de contenu</div>
     <div class="table-element" v-show="headerInfos.length">
       <div class="table-header line-element">
-        <div
-          class="table-cell"
-          v-for="(head, index) in headerInfos"
-          :key="index"
-        >
-          {{ head.alias }}
-        </div>
+        <div class="table-cell" v-for="(head, index) in headerInfos" :key="index">{{ head.alias }}</div>
         <div class="table-cell action"></div>
       </div>
       <transition-group name="list" tag="div" class="table-content">
@@ -47,9 +37,7 @@
           :class="[n === pageInfos.actual ? 'actual-page' : '']"
           :key="`pages-${n}`"
         >
-          <button @click="onPageClicked(n, n === pageInfos.actual)">
-            {{ n }}
-          </button>
+          <button @click="onPageClicked(n, n === pageInfos.actual)">{{ n }}</button>
         </div>
       </div>
     </div>
@@ -64,7 +52,7 @@ import {
   IObject,
   IPrintInfos,
   IPrintInfosAlias,
-  RequestTypes
+  RequestTypes,
 } from "../types";
 import { StringHelper, StorageHelper, apiHelper } from "../helpers";
 import LineEditElement from "../components/LineEditElement.vue";
@@ -78,8 +66,8 @@ const itemStore = namespace("item");
 @Component({
   components: {
     FlowerSpinner,
-    LineEditElement
-  }
+    LineEditElement,
+  },
 })
 export default class ListAdminPage extends Vue {
   // Mutations
@@ -102,7 +90,7 @@ export default class ListAdminPage extends Vue {
   }[] = [];
   private classes: IObject = {
     loading: false,
-    error: false
+    error: false,
   };
 
   // Life cycle
@@ -142,7 +130,7 @@ export default class ListAdminPage extends Vue {
     // Reset class object
     this.classes = {
       error: false,
-      loading: true
+      loading: true,
     };
   }
 
@@ -156,7 +144,7 @@ export default class ListAdminPage extends Vue {
     let printInfos: IPrintInfos = {
       exclude: [],
       alias: [],
-      required: []
+      required: [],
     };
 
     printInfos = this.infos && this.infos.print ? this.infos.print : printInfos;
@@ -177,12 +165,12 @@ export default class ListAdminPage extends Vue {
         arr.push({
           alias: title,
           value: alias.value,
-          order: alias.order
+          order: alias.order,
         });
       } else {
         arr.push({
           value: attribute,
-          alias: StringHelper.ucFirst(attribute)
+          alias: StringHelper.ucFirst(attribute),
         });
       }
       return arr;

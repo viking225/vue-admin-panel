@@ -1,4 +1,4 @@
-import { IObject } from '.';
+import { IObject } from ".";
 
 interface IAuthRequest {
   userName: string;
@@ -7,14 +7,14 @@ interface IAuthRequest {
 
 interface IResponse {
   status: number;
-  json: IObject
+  json: IObject;
 }
 
 enum ERequestState {
   Loading,
   Error,
   Success,
-  Base
+  Base,
 }
 
 export { IAuthRequest, ERequestState, IResponse };

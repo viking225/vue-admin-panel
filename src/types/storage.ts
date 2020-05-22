@@ -1,6 +1,6 @@
 interface IAuthStorage {
   token: string;
-  expiresIn: string
+  expiresIn: string;
 }
 
 interface IStorage {
@@ -10,4 +10,4 @@ interface IStorage {
   getTokenExpireDate(): string | null;
 }
 
-export { IAuthStorage, IStorage }
+export { IAuthStorage, IStorage };

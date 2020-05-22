@@ -2,10 +2,8 @@
   <div class="edit-admin-page" :class="classes">
     <div class="title">
       <h1>
-        {{ infos.name }}
-        <span>
-          {{ isPatch ? `: ${elementId}` : "" }}
-        </span>
+        {{ infos ? infos.name : "" }}
+        <span>{{ isPatch ? `: ${elementId}` : "" }}</span>
       </h1>
     </div>
     <div class="edit-content">
@@ -15,18 +13,14 @@
         :class="{ required: field.required }"
         :key="`field-${index}`"
       >
-        <div class="field-title">
-          {{ field.alias }}
-        </div>
+        <div class="field-title">{{ field.alias }}</div>
         <div class="field-value">
           <input v-model="item[field.value]" />
         </div>
       </div>
     </div>
     <div class="submit">
-      <button @click="onSubmit()">
-        {{ isPatch ? "Edit" : "Create" }}
-      </button>
+      <button @click="onSubmit()">{{ isPatch ? "Edit" : "Create" }}</button>
     </div>
     <div class="errorMsg">{{ errorMsg }}</div>
     <div class="loader">
@@ -36,39 +30,40 @@
 </template>
 
 <script lang="ts">
+import { Getter } from "vuex-class";
 import { Vue, Component, Watch, Prop } from "vue-property-decorator";
 import {
   IPrintInfos,
   IPrintInfosAlias,
   IObject,
-  IEndpointElement
+  IEndpointElement,
 } from "../types";
 import { FlowerSpinner } from "epic-spinners";
 import { apiHelper, StringHelper } from "../helpers";
 
 @Component({
   components: {
-    FlowerSpinner
-  }
+    FlowerSpinner,
+  },
 })
 export default class EditAdminPage extends Vue {
-  // Props
-  @Prop() private editInfos!: IEndpointElement;
-
+  @Prop() private modelName!: string;
+  // Store getter
+  @Getter("getEndpointInfoByName") getEndpointInfo;
   // Data
-  private infos: IEndpointElement = this.editInfos;
+  private infos: IEndpointElement | null = null;
   private elementId: number | null = null;
   private fieldsInfos: IPrintInfosAlias[] = [];
   private item: IObject = {};
   private errorMsg: string = "";
   private classes: IObject = {
     loading: false,
-    error: false
+    error: false,
   };
 
   // Life cycle
   async mounted() {
-    console.log("mounted");
+    this.infos = this.getEndpointInfo(StringHelper.normalize(this.modelName));
     if (this.isPatch) {
       this.loadItem();
     } else {
@@ -87,7 +82,12 @@ export default class EditAdminPage extends Vue {
     return !!this.elementId;
   }
 
-  get endpoint() {
+  get endpoint(): string {
+    if (!this.infos) {
+      return "";
+    }
+    console.log("help: ", this.infos.name);
+
     const name = this.infos.endpoint
       ? this.infos.endpoint
       : StringHelper.normalize(this.infos.name);
@@ -107,7 +107,11 @@ export default class EditAdminPage extends Vue {
 
   // Method
   updateFieldsInfos(data: IObject) {
-    console.log("launch update");
+    if (!this.infos) {
+      return null;
+    }
+
+    const endpointInfos = this.infos as IEndpointElement;
 
     // Construct attributes array with content of alias & keys of data
     let confAttributes: string[] = [];
@@ -136,19 +140,19 @@ export default class EditAdminPage extends Vue {
       let excluded = ["_id", "__v"];
       let requiredAttributes: string[] = [];
 
-      if (this.infos.edit) {
+      if (endpointInfos.edit) {
         excluded =
-          this.infos.edit.exclude.length > 0
-            ? this.infos.edit.exclude
+          endpointInfos.edit.exclude.length > 0
+            ? endpointInfos.edit.exclude
             : excluded;
 
         requiredAttributes =
-          this.infos.edit.required.length > 0
-            ? this.infos.edit.required
+          endpointInfos.edit.required.length > 0
+            ? endpointInfos.edit.required
             : requiredAttributes;
 
         // Find alias
-        const attributeInfos = this.infos.edit.alias.find(
+        const attributeInfos = endpointInfos.edit.alias.find(
           element => element.value === attribute
         );
         alias = attributeInfos ? attributeInfos.alias : alias;
@@ -170,7 +174,7 @@ export default class EditAdminPage extends Vue {
         value,
         alias,
         order,
-        required
+        required,
       };
     });
 
@@ -197,7 +201,7 @@ export default class EditAdminPage extends Vue {
   async findFirstOfItems(): Promise<IObject> {
     let item = {};
     const fetchParams = {
-      method: "GET"
+      method: "GET",
     };
 
     let response: any = null;
@@ -222,11 +226,11 @@ export default class EditAdminPage extends Vue {
 
     this.classes = {
       loading: false,
-      error: false
+      error: false,
     };
 
     const fetchParams = {
-      method: "GET"
+      method: "GET",
     };
 
     let response: any = null;
@@ -236,7 +240,7 @@ export default class EditAdminPage extends Vue {
     } catch (e) {
       this.classes = {
         error: true,
-        loading: false
+        loading: false,
       };
       this.errorMsg = "Unknown error";
       return;
@@ -270,12 +274,12 @@ export default class EditAdminPage extends Vue {
     // Launch request
     this.classes = {
       loading: true,
-      error: false
+      error: false,
     };
 
     const fetchParams = {
       method: this.isPatch ? "PATCH" : "POST",
-      body: JSON.stringify(this.item)
+      body: JSON.stringify(this.item),
     };
 
     let response: any = null;
@@ -285,7 +289,7 @@ export default class EditAdminPage extends Vue {
     } catch (e) {
       this.classes = {
         error: false,
-        loading: false
+        loading: false,
       };
       this.errorMsg = "Unknown error";
       return;
@@ -304,7 +308,7 @@ export default class EditAdminPage extends Vue {
     console.log(this.$route);
 
     this.$router.push({
-      path: `/${this.endpoint}`
+      path: `/${this.endpoint}`,
     });
   }
 

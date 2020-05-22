@@ -11,10 +11,10 @@ Vue.use(Vuex);
 const store: Store<IStore> = new Vuex.Store({
   modules: {
     auth: authStore,
-    item: itemStore
+    item: itemStore,
   },
   state: {
-    endpoints
+    endpoints,
   },
   getters: {
     getEndpointInfoByName: state => (name): IEndpointElement | null => {
@@ -23,10 +23,10 @@ const store: Store<IStore> = new Vuex.Store({
         endpoint => StringHelper.normalize(endpoint.name) === name
       );
       return endpoint ? endpoint : null;
-    }
+    },
   },
   mutations: {},
-  actions: {}
+  actions: {},
 });
 
 export default store;

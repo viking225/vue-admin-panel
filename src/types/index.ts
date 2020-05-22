@@ -9,7 +9,7 @@ interface IinfoType {
 }
 
 interface IObject {
-  [key: string] : any;
+  [key: string]: any;
 }
 
 interface IPrintInfosAlias {
@@ -20,9 +20,9 @@ interface IPrintInfosAlias {
 }
 
 interface IPrintInfos {
-  exclude: string[]
-  alias: IPrintInfosAlias[]
-  required: string[]
+  exclude: string[];
+  alias: IPrintInfosAlias[];
+  required: string[];
 }
 
 interface IEndpointElement {
@@ -35,7 +35,7 @@ interface IEndpointElement {
     patch: Boolean;
     create: Boolean;
     delete: Boolean;
-  }
+  };
 }
 
 interface IAppConfig {
@@ -51,5 +51,5 @@ export {
   IPrintInfos,
   IPrintInfosAlias,
   StorageTypes,
-  IStore
+  IStore,
 };

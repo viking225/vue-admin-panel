@@ -6,21 +6,21 @@ const actualItems: IObject[] = [];
 const pageInfos: IPagesInfos = {
   actual: 1,
   max: 1,
-  limit: 10
+  limit: 10,
 };
 
 const state: IitemStore = {
   actualItems,
   pageInfos,
   status: RequestTypes.ERequestState.Base,
-  errorMessage: ""
+  errorMessage: "",
 };
 const actions = {
   async deleteItem({ commit, state }, { endpoint, id }) {
     commit("request");
 
     const fetchParams = {
-      method: "DELETE"
+      method: "DELETE",
     };
 
     try {
@@ -31,6 +31,7 @@ const actions = {
     }
     commit("success");
   },
+
   async loadItems({ commit, state }, endpoint) {
     console.log("Call load items");
     commit("request");
@@ -38,7 +39,7 @@ const actions = {
       state.pageInfos.actual * state.pageInfos.limit - state.pageInfos.limit;
     const findParams = {
       $limit: state.pageInfos.limit,
-      $skip
+      $skip,
     };
 
     let count = 0;
@@ -63,7 +64,7 @@ const actions = {
     }
 
     commit("load_success", response.json);
-  }
+  },
 };
 const getters = {};
 const mutations = {
@@ -89,7 +90,7 @@ const mutations = {
   },
   changePage: (state, pageNumber: number) => {
     state.pageInfos.actual = pageNumber;
-  }
+  },
 };
 
 export default {
@@ -97,5 +98,5 @@ export default {
   state,
   actions,
   getters,
-  mutations
+  mutations,
 };

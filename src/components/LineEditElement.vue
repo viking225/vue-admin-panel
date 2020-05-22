@@ -5,14 +5,10 @@
       v-for="(header, index) in attributes"
       :key="index"
       v-show="show"
-    >
-      {{ data[header.value] }}
-    </div>
+    >{{ data[header.value] }}</div>
     <div class="table-cell action" v-show="show">
       <button>
-        <router-link :to="`/${this.apiurl}`">
-          Edit
-        </router-link>
+        <router-link :to="`/${this.apiurl}/${this.data._id}`">Edit</router-link>
       </button>
       <button @click="onDelete">Delete</button>
     </div>
@@ -28,7 +24,7 @@ import { apiHelper, StringHelper } from "../helpers";
 const itemStore = namespace("item");
 
 @Component({})
-export default class LineEditElment extends Vue {
+export default class LineEditElement extends Vue {
   // Getter
   @itemStore.Action("deleteItem") deleteItem;
   // Props
