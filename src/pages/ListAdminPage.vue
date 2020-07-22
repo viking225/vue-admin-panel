@@ -1,3 +1,9 @@
+
+<style lang="scss">
+@import "styles/ListAdminPage.scss";
+</style>
+
+
 <template>
   <div class="element-admin-page" :class="classes" v-show="infos">
     <div class="title">
@@ -45,6 +51,7 @@
 </template>
 
 <script lang="ts">
+// import "./styles/ListAdminPage.scss";
 import { Getter, State, Action, namespace } from "vuex-class";
 import { Vue, Component, Prop, Watch } from "vue-property-decorator";
 import {
@@ -213,119 +220,3 @@ export default class ListAdminPage extends Vue {
   }
 }
 </script>
-
-<style scoped>
-.element-admin-page {
-  display: flex;
-  flex-flow: column;
-  background-color: #2c3e50;
-  color: white;
-  align-content: center;
-  min-height: 100%;
-}
-
-.toolbar,
-.title {
-  display: flex;
-  flex-flow: row;
-  justify-content: space-around;
-  padding: 5px 0px 5px 0px;
-}
-
-.loader,
-.errorMsg {
-  display: none;
-}
-
-.pages-container {
-  padding: 10px 20%;
-  display: flex;
-  flex-flow: row;
-}
-
-.pages-element {
-  flex-grow: 1;
-  background: white;
-  margin: 5px 5px;
-}
-
-.pages-element.actual-page {
-  background: slategrey;
-}
-
-.pages-element button {
-  padding: 5px 5px;
-  width: 100%;
-  background: none;
-  color: inherit;
-  border: none;
-  font: inherit;
-  cursor: pointer;
-  outline: inherit;
-}
-
-.table-element {
-  color: black;
-  margin: 10px 5px 10px 5px;
-  display: flex;
-  flex-flow: column;
-  padding: 0;
-}
-
-.table-header,
-.line-element {
-  display: flex;
-  flex-flow: row;
-}
-/* Transition */
-.list-enter-active,
-.list-leave-active {
-  transition: all 1s;
-}
-
-.list-enter {
-  opacity: 0;
-  transform: translateX(10px);
-}
-
-.list-leave-to {
-  opacity: 0;
-}
-
-.table-header > .table-cell {
-  background-color: slategrey;
-  border: solid black;
-  color: white;
-}
-
-.table-cell,
-.table-content >>> .table-cell {
-  word-wrap: break-word;
-  box-sizing: border-box;
-  padding: 0.5em 0.5em;
-  background: white;
-  overflow: hidden;
-  border: solid white;
-  flex-basis: 100%;
-}
-
-/* ON Loading */
-.loading .loader {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-}
-
-.loading .toolbar {
-  display: none;
-}
-/* On error */
-.error .table-content {
-  box-shadow: 0 4px 8px 0 #e50c0c, 0 6px 20px 0 #e50c0c;
-}
-.error .errorMsg {
-  display: inline-block;
-  color: tomato;
-}
-/* .toolbar button {} */
-</style>
