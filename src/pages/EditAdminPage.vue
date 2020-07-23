@@ -1,3 +1,7 @@
+<style scoped>
+@import "styles/EditAdminPage.scss";
+</style>
+
 <template>
   <div class="edit-admin-page" :class="classes">
     <div class="title">
@@ -82,15 +86,23 @@ export default class EditAdminPage extends Vue {
     return !!this.elementId;
   }
 
+  get baseEndpoint(): string {
+    if (!this.infos) {
+      console.log("No base infos");
+      return "";
+    }
+    return this.infos.endpoint
+      ? this.infos.endpoint
+      : StringHelper.normalize(this.infos.name);
+  }
+
   get endpoint(): string {
     if (!this.infos) {
       return "";
     }
-    console.log("help: ", this.infos.name);
 
-    const name = this.infos.endpoint
-      ? this.infos.endpoint
-      : StringHelper.normalize(this.infos.name);
+    const name = this.baseEndpoint;
+
     return this.isPatch ? `${name}/${this.elementId}` : `${name}/`;
   }
 
@@ -305,98 +317,19 @@ export default class EditAdminPage extends Vue {
     this.elementId = this.item._id;
     // Redirect
     console.log(this.endpoint);
-    console.log(this.$route);
 
     this.$router.push({
-      path: `/${this.endpoint}`,
+      path: `/${this.baseEndpoint}`,
     });
   }
 
   validateRequired(): Boolean {
-    const unValidated = this.fieldsInfos.some(fieldInfos => {
+    return !this.fieldsInfos.some(fieldInfos => {
       if (!fieldInfos.required) {
         return false;
       }
       return !this.item[fieldInfos.value] || this.item[fieldInfos.value] === "";
     });
-    return !unValidated;
   }
 }
 </script>
-<style scoped>
-.edit-admin-page {
-  background: #2c3e50;
-  color: white;
-  display: flex;
-  min-height: 100%;
-  padding: 0% 10%;
-  flex-flow: column;
-  text-align: center;
-}
-
-.edit-content {
-  display: flex;
-  flex-flow: column;
-}
-
-.field-content {
-  display: flex;
-  flex-flow: row;
-  justify-content: flex-start;
-}
-
-.field-title,
-.field-value {
-  padding: 0 5%;
-}
-
-.field-title {
-  flex: 1 1;
-  text-align: left;
-}
-
-.required .field-title::after {
-  content: "*";
-  color: tomato;
-}
-.field-value {
-  flex: 2 1;
-}
-
-.field-value > input {
-  min-width: 100%;
-}
-
-.submit {
-  padding: 5% 10%;
-  display: flex;
-}
-
-.submit > button {
-  padding: 2%;
-  flex: 1 1 20%;
-}
-
-.loader,
-.errorMsg {
-  display: none;
-}
-
-.loader > div {
-  flex: 1 1 auto;
-}
-
-/* On loading */
-.loading .loader {
-  display: flex;
-}
-
-/* On error */
-.error .edit-content {
-  box-shadow: 0 4px 8px 0 #e50c0c, 0 6px 20px 0 #e50c0c;
-}
-.error .errorMsg {
-  display: inline-block;
-  color: tomato;
-}
-</style>
